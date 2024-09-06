@@ -1,5 +1,6 @@
 package com.yessorae.yabaltravel.presentation
 
+import androidx.lifecycle.ViewModel
 import com.yessorae.yabaltravel.presentation.model.MainScreenState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.AfterThrowingState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.BeforeThrowingState
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() {
+class MainViewModel @Inject constructor(): ViewModel() {
     private val _screenState =
         MutableStateFlow<MainScreenState>(MainScreenState.BeforeThrowingState)
     val screenState = _screenState.asStateFlow()
