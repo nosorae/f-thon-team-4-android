@@ -20,6 +20,14 @@ android {
     }
 
     buildTypes {
+        defaultConfig {
+            buildConfigField(
+                "String",
+                "KAKAO_API_KEY",
+                "${properties["KAKAO_API_KEY"]}"
+            )
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -34,6 +42,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 
