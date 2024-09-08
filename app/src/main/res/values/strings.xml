@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">yabaltravel</string>
+
+    <!-- Intro activity  -->
+    <string name="btn_start">시작</string>
+
+    <!-- Toast message   -->
+    <string name="msg_setUp_error">인터넷 혹은 앱 사용에 문제가 있습니다.</string>
 </resources>
