@@ -1,7 +1,7 @@
 package com.yessorae.yabaltravel.data.repository
 
-import javax.inject.Inject
+import com.yessorae.yabaltravel.data.model.RecommendationDto
 
-class RecommendationRepository @Inject constructor() {
-
+interface RecommendationRepository {
+    fun  getRecommendation(): List<RecommendationDto>
 }
