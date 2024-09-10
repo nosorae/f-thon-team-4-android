@@ -17,17 +17,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField(
+            "String",
+            "KAKAO_API_KEY",
+            "\"${properties["kakaoMap"]}\""
+        )
     }
 
     buildTypes {
-        defaultConfig {
-            buildConfigField(
-                "String",
-                "KAKAO_API_KEY",
-                "${properties["KAKAO_API_KEY"]}"
-            )
-        }
-
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -65,6 +62,7 @@ dependencies {
 
     // TODO 제거 또는 테스트 코드 작설
     implementation(libs.kakoMap)
+    implementation(libs.kakaoMapOpen)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

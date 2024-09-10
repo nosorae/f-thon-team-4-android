@@ -1,5 +1,6 @@
 package com.yessorae.yabaltravel.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -29,6 +30,8 @@ class IntroActivity : AppCompatActivity() {
                 return@Observer
             }
             Log.d(this.javaClass.name, "Success to check Internet and Sensor go to main page")
+            val intent = Intent(this , MainActivity :: class.java)
+            startActivity(intent)
         })
     }
 
