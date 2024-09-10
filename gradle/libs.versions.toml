@@ -16,6 +16,7 @@ serialization = "1.6.0"
 hilt = "2.48.1"
 kakaoMap = "2.20.5"
 kakaoMapsOpen = "2.11.9"
+lifecycle = "2.8.5"
 
 [libraries]
 google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
@@ -31,6 +32,8 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 kakoMap ={ group = "com.kakao.sdk" , name = "v2-navi" , version.ref = "kakaoMap"}
 kakaoMapOpen = { group = "com.kakao.maps.open", name = "android", version.ref = "kakaoMapsOpen" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+
 
 
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }

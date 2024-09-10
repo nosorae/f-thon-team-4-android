@@ -1,4 +1,4 @@
-package com.yessorae.yabaltravel.data.model
+package com.yessorae.yabaltravel.data.source.remote.yabal.model
 
 data class RecommendationDto(
     val id: Int,

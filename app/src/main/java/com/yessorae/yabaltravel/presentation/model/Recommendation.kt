@@ -1,6 +1,6 @@
 package com.yessorae.yabaltravel.presentation.model
 
-import com.yessorae.yabaltravel.data.model.RecommendationDto
+import com.yessorae.yabaltravel.data.source.remote.yabal.model.RecommendationDto
 
 data class Recommendation(
     val id: Int,

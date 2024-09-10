@@ -1,10 +1,11 @@
 package com.yessorae.yabaltravel.data.repository
 
-import com.yessorae.yabaltravel.data.model.RecommendationDto
+import com.yessorae.yabaltravel.data.source.remote.yabal.model.RecommendationDto
 import javax.inject.Inject
 
 class RecommendationRepositoryImpl @Inject constructor(): RecommendationRepository {
     override fun getRecommendation(): List<RecommendationDto> {
+        // TODO yabal 서버에서 가져오기=
         return listOf(
             RecommendationDto(1, 37.5665f, 126.9780f, "Seoul"),
             RecommendationDto(2, 35.6895f, 139.6917f, "Tokyo"),

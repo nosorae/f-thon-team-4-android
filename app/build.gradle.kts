@@ -1,9 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.dagger.hilt.android)
     alias(libs.plugins.jetbrains.kotlin.kapt)
+    alias(libs.plugins.jetbrains.kotlin.plugin.serialization)
 }
+
+val properties = Properties()
+val localPropertiesFile = rootProject.file("local.properties").inputStream()
+properties.load(localPropertiesFile)
+localPropertiesFile.close()
 
 android {
     namespace = "com.yessorae.yabaltravel"
@@ -20,7 +28,7 @@ android {
         buildConfigField(
             "String",
             "KAKAO_API_KEY",
-            "\"${properties["kakaoMap"]}\""
+            "${properties["KAKAO_API_KEY"]}"
         )
     }
 
@@ -59,6 +67,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    implementation(libs.squareup.okhttp3.logging.interceptor)
+    implementation(libs.squareup.retrofit2.retrofit)
+    implementation(libs.squareup.retrofit2.converter.kotlinx.serialization)
+    implementation(libs.jetbrains.kotlinx.serialization.json)
 
     // TODO 제거 또는 테스트 코드 작설
     implementation(libs.kakoMap)
