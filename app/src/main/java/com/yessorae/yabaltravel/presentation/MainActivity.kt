@@ -44,13 +44,6 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
         sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
         KakaoMapSdk.init(this ,kakaoKey)
         binding.mapKakao.start(lifeCycleCallback , readyCallback)
-        /**
-         * 소래님 여기에 hash값이 등록이 되어야 해당 kakao map이 호출이 된다고 합니다.
-         * 저의 hash 키 값은 STGKeOh2mOWj8ddPI0VpjdhHtDw= 입니다.
-         * 문제 있으면 바로 DM 주십시요
-         */
-//        var kakaoHash = Utility.getKeyHash(this)
-//        Log.e(this.javaClass.name , "Hash data : $kakaoHash")
     }
 
     private fun setMarker(){
@@ -62,7 +55,7 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
 
     override fun onShake() {
         Log.d(this.javaClass.name, "Device Shaken!")
-//        viewModel.onThrowing()
+        viewModel.onThrowing()
     }
 
     override fun onDestroy() {
