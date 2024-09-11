@@ -15,6 +15,7 @@ import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.KakaoMapSdk
 import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
+import com.kakao.vectormap.camera.CameraAnimation
 import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
@@ -113,7 +114,6 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
     private fun handleScreenState(screenState: MainScreenState) {
         when (screenState) {
             is MainScreenState.BeforeThrowingState -> {
-                // TODO
             }
 
             is MainScreenState.AfterThrowingState -> {
@@ -122,13 +122,11 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
                  */
                 val map = kakaoMap ?: return
 
-                val update = CameraUpdateFactory.newCenterPosition(
-                    LatLng.from(
-                        screenState.x.toDouble(),
-                        screenState.y.toDouble()
-                    )
+                val latLng =  LatLng.from(
+                    screenState.x.toDouble(),
+                    screenState.y.toDouble()
                 )
-                map.moveCamera(update)
+                kakaoMap?.moveCamera(CameraUpdateFactory.newCenterPosition(LatLng.from(latLng.longitude, latLng.latitude)));
                 val pos = map.cameraPosition?.position
 
                 val labelManager = map.labelManager
@@ -136,17 +134,15 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
                     LabelStyles.from("thumbsUp", LabelStyle.from(R.drawable.pink_marker))
                 )
                 labelManager.layer!!.addLabel(
-                    LabelOptions.from("label", pos)
+                    LabelOptions.from("label", latLng)
                         .setStyles(thumbsUpStyle)
                 )
             }
 
             is MainScreenState.RecommendationSuccessState -> {
-                // TODO
             }
 
             is MainScreenState.RecommendationFailureState -> {
-                // TODO
             }
         }
     }
