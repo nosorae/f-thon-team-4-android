@@ -6,8 +6,8 @@ sealed class MainScreenState {
 
     // 던지는 모션 감지하면 이 상태로 전환
     data class AfterThrowingState(
-        val x: Float,
-        val y: Float
+        val lat: Double,
+        val lng: Double
     ) : MainScreenState()
 
     // 추천 목록을 가져오는데 성공하면 이 상태로 전환
