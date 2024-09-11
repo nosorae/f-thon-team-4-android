@@ -17,7 +17,6 @@ import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.KakaoMapSdk
 import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
-import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
@@ -30,14 +29,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
+class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sensorManager: SensorManager
     private lateinit var shakeDetector: ShakerDetector
     private val viewModel: MainViewModel by viewModels()
     private val kakaoKey = "1c5de4030ea347c753fcf2c26b656b58"
     private val startPosition: LatLng = LatLng.from(37.394660, 127.111182)
-    private val startZoomLevel = 15
+    private val defaultZoomLevel = 6
     private var kakaoMap: KakaoMap? = null
     private val readyCallback: KakaoMapReadyCallback = object : KakaoMapReadyCallback() {
         override fun onMapReady(kakaoMap: KakaoMap) {
@@ -50,7 +49,7 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
         }
 
         override fun getZoomLevel(): Int {
-            return startZoomLevel
+            return defaultZoomLevel
         }
     }
     private val lifeCycleCallback: MapLifeCycleCallback = object : MapLifeCycleCallback() {
@@ -82,20 +81,13 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        init()
-    }
-
-    private fun init() {
-        initSensor()
-        initButtons()
+        initViews()
         observe()
     }
 
-    private fun initSensor() {
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        shakeDetector = ShakerDetector(this)
-        val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
+    private fun initViews() {
+        initButtons()
+        initKakaoMap()
     }
 
     private fun initButtons() {
@@ -119,7 +111,8 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
     private fun handleScreenState(screenState: MainScreenState) {
         when (screenState) {
             is MainScreenState.BeforeThrowingState -> {
-                initKakaoMap()
+                resetKakaoMap()
+                initSensor()
             }
 
             is MainScreenState.AfterThrowingState -> {
@@ -128,17 +121,20 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
                  */
                 val map = kakaoMap ?: return
 
-                val latLng =  LatLng.from(
-                    screenState.x.toDouble(),
-                    screenState.y.toDouble()
+                val latLng = LatLng.from(
+                    screenState.lng,
+                    screenState.lat
                 )
-                kakaoMap?.moveCamera(CameraUpdateFactory.newCenterPosition(LatLng.from(latLng.longitude, latLng.latitude)));
-                val pos = map.cameraPosition?.position
 
                 val labelManager = map.labelManager
+
                 val thumbsUpStyle = labelManager!!.addLabelStyles(
-                    LabelStyles.from("thumbsUp", LabelStyle.from(R.drawable.pink_marker))
+                    LabelStyles.from(
+                        "thumbsUp",
+                        LabelStyle.from(R.drawable.pink_marker)
+                    )
                 )
+
                 labelManager.layer!!.addLabel(
                     LabelOptions.from("label", latLng)
                         .setStyles(thumbsUpStyle)
@@ -146,9 +142,11 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
             }
 
             is MainScreenState.RecommendationSuccessState -> {
+                // TODO
             }
 
             is MainScreenState.RecommendationFailureState -> {
+                // TODO
             }
         }
 
@@ -156,14 +154,25 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
         binding.btnRecommendation.isVisible = screenState is MainScreenState.AfterThrowingState
     }
 
+    private fun initSensor() {
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        shakeDetector = ShakerDetector {
+            Log.d(this.javaClass.name, "Device Shaken!")
+            viewModel.onThrowing()
+            sensorManager.unregisterListener(shakeDetector)
+        }
+        val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
+    }
+
     private fun initKakaoMap() {
         KakaoMapSdk.init(this, kakaoKey)
         binding.mapKakao.start(lifeCycleCallback, readyCallback)
     }
 
-    override fun onShake() {
-        Log.d(this.javaClass.name, "Device Shaken!")
-        viewModel.onThrowing()
+    private fun resetKakaoMap() {
+        val labelManager = kakaoMap?.labelManager ?: return
+        labelManager.clearAll()
     }
 
     override fun onDestroy() {

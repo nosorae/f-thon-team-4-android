@@ -7,11 +7,7 @@ import android.hardware.SensorManager
 import android.util.Log
 import kotlin.math.sqrt
 
-class ShakerDetector(private val listener: OnShareListener) : SensorEventListener {
-
-    interface OnShareListener {
-        fun onShake()
-    }
+class ShakerDetector(private val onShake: () -> Unit) : SensorEventListener {
 
     private var lastShakeTime: Long = 0
     override fun onSensorChanged(event: SensorEvent?) {
@@ -25,7 +21,7 @@ class ShakerDetector(private val listener: OnShareListener) : SensorEventListene
                 val currentTime = System.currentTimeMillis()
                 if (currentTime - lastShakeTime > SHAKE_SLOP_TIME_MS) {
                     lastShakeTime = currentTime
-                    listener.onShake()
+                    onShake()
                 }
             }
         }

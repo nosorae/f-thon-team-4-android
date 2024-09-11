@@ -50,8 +50,8 @@ class MainViewModel @Inject constructor(
 
         _screenState.update {
             AfterThrowingState(
-                x = response.x.toFloat(),
-                y = response.y.toFloat()
+                lat = response.x,
+                lng = response.y
             )
         }
     }
