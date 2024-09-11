@@ -15,7 +15,6 @@ import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.KakaoMapSdk
 import com.kakao.vectormap.LatLng
 import com.kakao.vectormap.MapLifeCycleCallback
-import com.kakao.vectormap.camera.CameraAnimation
 import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
@@ -69,7 +68,6 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
         }
 
         override fun onMapError(error: java.lang.Exception) {
-            viewModel.onThrowing() // TODO Delete
             Toast.makeText(
                 applicationContext, error.message,
                 Toast.LENGTH_SHORT
@@ -79,28 +77,33 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         init()
-        addListener()
     }
 
     private fun init() {
+        initSensor()
+        initButtons()
+        observe()
+    }
+
+    private fun initSensor() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         shakeDetector = ShakerDetector(this)
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
-        KakaoMapSdk.init(this, kakaoKey)
-        binding.mapKakao.start(lifeCycleCallback, readyCallback)
-        observe()
     }
 
-    private fun setMarker() {
+    private fun initButtons() {
+        binding.btnRetry.setOnClickListener {
+            viewModel.onClickRetryThrowing()
+        }
 
-    }
-
-    private fun addListener() {
-
+        binding.btnRecommendation.setOnClickListener {
+            viewModel.onClickGetRecommendation()
+        }
     }
 
     private fun observe() {
@@ -114,6 +117,7 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
     private fun handleScreenState(screenState: MainScreenState) {
         when (screenState) {
             is MainScreenState.BeforeThrowingState -> {
+                initKakaoMap()
             }
 
             is MainScreenState.AfterThrowingState -> {
@@ -145,6 +149,14 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
             is MainScreenState.RecommendationFailureState -> {
             }
         }
+
+        binding.btnRetry.isVisible = screenState is MainScreenState.AfterThrowingState
+        binding.btnRecommendation.isVisible = screenState is MainScreenState.AfterThrowingState
+    }
+
+    private fun initKakaoMap() {
+        KakaoMapSdk.init(this, kakaoKey)
+        binding.mapKakao.start(lifeCycleCallback, readyCallback)
     }
 
     override fun onShake() {
