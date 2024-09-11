@@ -1,5 +1,6 @@
 package com.yessorae.yabaltravel.presentation
 
+
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Bundle
@@ -28,6 +29,7 @@ import com.yessorae.yabaltravel.presentation.model.ShakerDetector
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
@@ -104,7 +106,8 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
         }
 
         binding.btnRecommendation.setOnClickListener {
-            viewModel.onClickGetRecommendation()
+            viewModel.testCode()
+//            viewModel.onClickGetRecommendation("서울특별시","강남구" ,1 , 10)
         }
     }
 
@@ -146,6 +149,27 @@ class MainActivity : AppCompatActivity(), ShakerDetector.OnShareListener {
             }
 
             is MainScreenState.RecommendationSuccessState -> {
+                val result = screenState.recommendation
+                val longitude = result.map { it.longitude }.average()
+                val latitude = result.map { it.latitude }.average()
+                kakaoMap?.moveCamera(CameraUpdateFactory.newCenterPosition(LatLng.from(longitude, latitude)))
+//                val labelManager = kakaoMap?.labelManager
+//                val thumbsUpStyle = labelManager!!.addLabelStyles(
+//                    LabelStyles.from("thumbsUp", LabelStyle.from(R.drawable.pink_marker))
+//                )
+//                labelManager.layer!!.addLabel(
+//                    LabelOptions.from("label", LatLng.from(longitude ,latitude))
+//                        .setStyles(thumbsUpStyle)
+//                )
+                for(item in result){
+                    val styles = kakaoMap!!.labelManager
+                        ?.addLabelStyles(
+                            LabelStyles.from(LabelStyle.from(R.drawable.pink_marker)))
+                    val options = LabelOptions . from (LatLng.from(item.longitude, item.latitude))
+                        .setStyles(styles)
+                    val layer = kakaoMap!!.labelManager!!.layer
+                    val label = layer!!.addLabel(options)
+                }
             }
 
             is MainScreenState.RecommendationFailureState -> {

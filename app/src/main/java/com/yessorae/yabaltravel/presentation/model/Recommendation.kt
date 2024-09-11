@@ -1,13 +1,15 @@
 package com.yessorae.yabaltravel.presentation.model
 
-import com.yessorae.yabaltravel.data.source.remote.yabal.model.RecommendationDto
+import androidx.core.view.ContentInfoCompat.Flags
+
 
 data class Recommendation(
-    val id: Int,
-    val title: String
+    val name: String,
+    val description: String,
+    val longitude : Double,
+    val latitude : Double
 )
-
-fun RecommendationDto.asDto() = Recommendation(
-    id = id,
-    title = name
+data class TestCode(
+    val x : Double,
+    val y : Double
 )

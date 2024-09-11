@@ -10,7 +10,8 @@ import com.yessorae.yabaltravel.presentation.model.MainScreenState.AfterThrowing
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.BeforeThrowingState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.RecommendationFailureState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.RecommendationSuccessState
-import com.yessorae.yabaltravel.presentation.model.asDto
+import com.yessorae.yabaltravel.presentation.model.Recommendation
+import com.yessorae.yabaltravel.presentation.model.TestCode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +28,8 @@ class MainViewModel @Inject constructor(
     private val _screenState =
         MutableStateFlow<MainScreenState>(BeforeThrowingState)
     val screenState = _screenState.asStateFlow()
+
+    private val testCode = ArrayList<Recommendation>()
 
     /**
      * [BeforeThrowingState] 상태에서 추가하는 함수는 여기에 추가해주세요
@@ -64,10 +67,38 @@ class MainViewModel @Inject constructor(
         _screenState.update { BeforeThrowingState }
     }
 
-    fun onClickGetRecommendation() {
+    fun testCode() {
+        testCode.add(Recommendation("ㅁ" , "ㅁ",37.394660, 127.111182))
+        testCode.add(Recommendation("ㄴ","ㄴ",37.395660, 127.111182))
+        testCode.add(Recommendation("ㅇ","ㅇ",37.393660, 127.111182))
+        testCode.add(Recommendation("ㄹ","ㄹ",37.396660, 127.111182))
+       _screenState.update {
+           RecommendationSuccessState(
+               recommendation = testCode
+           )
+       }
+    }
+
+    fun onClickGetRecommendation(
+        ctPrvnName: String,
+        siGunGuNam: String,
+        page: Int,
+        size: Int ) = viewModelScope.launch {
         _screenState.update {
+            val response =  recommendationRepository.getRecommendation(ctPrvnName , siGunGuNam , page, size)
+            val result = ArrayList<Recommendation>()
+            for(item in response){
+                result.add(
+                    Recommendation(
+                    item.name,
+                    item.description,
+                    item.longitude,
+                    item.latitude
+                )
+                )
+            }
             RecommendationSuccessState(
-                recommendation = recommendationRepository.getRecommendation().map { it.asDto() }
+                recommendation = result
             )
         }
     }
@@ -83,4 +114,5 @@ class MainViewModel @Inject constructor(
     /**
      * [RecommendationFailureState] 상태에서 추가하는 함수는 여기에 추가해주세요
      */
+
 }
