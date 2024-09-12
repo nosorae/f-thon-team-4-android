@@ -17,7 +17,7 @@ hilt = "2.48.1"
 kakaoMap = "2.20.5"
 kakaoMapsOpen = "2.11.9"
 lifecycle = "2.8.5"
-
+playServicesLocation = "21.3.0"
 [libraries]
 google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 google-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
@@ -34,7 +34,7 @@ kakoMap ={ group = "com.kakao.sdk" , name = "v2-navi" , version.ref = "kakaoMap"
 kakaoMapOpen = { group = "com.kakao.maps.open", name = "android", version.ref = "kakaoMapsOpen" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 
-
+google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }

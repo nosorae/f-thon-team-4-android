@@ -77,6 +77,8 @@ dependencies {
     // TODO 제거 또는 테스트 코드 작설
     implementation(libs.kakoMap)
     implementation(libs.kakaoMapOpen)
+    implementation(libs.google.play.services.location)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

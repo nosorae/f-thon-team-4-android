@@ -1,14 +1,19 @@
 package com.yessorae.yabaltravel.presentation
 
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +27,15 @@ import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
+import android.Manifest
+import android.annotation.SuppressLint
+import android.location.Location
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.yessorae.yabaltravel.R
+import com.yessorae.yabaltravel.common.BottomSheetListener
+import com.yessorae.yabaltravel.common.Define
 import com.yessorae.yabaltravel.databinding.ActivityMainBinding
 import com.yessorae.yabaltravel.presentation.model.MainScreenState
 import com.yessorae.yabaltravel.presentation.model.ShakerDetector
@@ -32,7 +45,7 @@ import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), BottomSheetListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sensorManager: SensorManager
     private lateinit var shakeDetector: ShakerDetector
@@ -41,6 +54,19 @@ class MainActivity : AppCompatActivity() {
     private val startPosition: LatLng = LatLng.from(37.394660, 127.111182)
     private val defaultZoomLevel = 6
     private var kakaoMap: KakaoMap? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                Log.i("Permission: ", "Granted")
+                getLastKnownLocation()
+            } else {
+               finish()
+            }
+        }
     private val readyCallback: KakaoMapReadyCallback = object : KakaoMapReadyCallback() {
         override fun onMapReady(kakaoMap: KakaoMap) {
             Toast.makeText(applicationContext, "Map Start!", Toast.LENGTH_SHORT).show()
@@ -91,6 +117,8 @@ class MainActivity : AppCompatActivity() {
     private fun initViews() {
         initButtons()
         initKakaoMap()
+        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     private fun initButtons() {
@@ -149,20 +177,31 @@ class MainActivity : AppCompatActivity() {
                 val result = screenState.recommendation
                 val longitude = result.map { it.longitude }.average()
                 val latitude = result.map { it.latitude }.average()
-                kakaoMap?.moveCamera(CameraUpdateFactory.newCenterPosition(LatLng.from(longitude, latitude)))
-                for(item in result){
+                kakaoMap?.moveCamera(
+                    CameraUpdateFactory.newCenterPosition(
+                        LatLng.from(
+                            latitude,
+                            longitude
+                        )
+                    )
+                )
+                for (item in result) {
                     val styles = kakaoMap!!.labelManager
                         ?.addLabelStyles(
-                            LabelStyles.from(LabelStyle.from(R.drawable.pink_marker)))
-                    val options = LabelOptions . from (LatLng.from(item.longitude, item.latitude))
+                            LabelStyles.from(LabelStyle.from(R.drawable.pink_marker))
+                        )
+                    val options = LabelOptions.from(LatLng.from(item.latitude , item.longitude))
                         .setStyles(styles)
                     val layer = kakaoMap!!.labelManager!!.layer
                     val label = layer!!.addLabel(options)
                 }
+                val recommendData = viewModel.makeRecommendData(result, this)
+                val bottomSheet = RecommendBottomSheet(recommendData ,this)
+                bottomSheet.show(supportFragmentManager, bottomSheet.tag)
             }
 
             is MainScreenState.RecommendationFailureState -> {
-                // TODO
+                Log.d("test", "Na")
             }
         }
 
@@ -195,4 +234,56 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         sensorManager.unregisterListener(shakeDetector)
     }
+
+    override fun onBottomSheetDismissed(resultCode: Int) {
+        when (resultCode) {
+            Define.BOTTOM_SHEET_SELECT -> {
+                Log.d(this.javaClass.name, "User select go to Trip")
+                searchLoadToKakaoMap()
+            }
+
+            Define.BOTTOM_SHEET_NO -> {
+                Log.e(this.javaClass.name, "User select reTry")
+                resetKakaoMap()
+            }
+        }
+    }
+    @SuppressLint("MissingPermission")
+    private fun getLastKnownLocation() {
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                location?.let {
+                    val latitude = it.latitude
+                    val longitude = it.longitude
+                    // 여기서 좌표를 사용
+                    viewModel.setLocation(latitude , longitude)
+                    Log.d("MainActivity", "Latitude: $latitude, Longitude: $longitude")
+                }
+            }
+    }
+
+    private fun searchLoadToKakaoMap() {
+        val url ="kakaomap://route?sp=${viewModel.getLocation().first},${viewModel.getLocation().second}&ep=${viewModel.getRecommend().latitude},${viewModel.getRecommend().longitude}&by=FOOT"
+
+        val intent =  Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        intent.addCategory(Intent.CATEGORY_BROWSABLE)
+
+        val installCheck = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            this.packageManager.queryIntentActivities(
+                Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER),
+                PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong())
+            )
+        } else {
+            this.packageManager.queryIntentActivities(
+                Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER),
+                PackageManager.GET_META_DATA
+            )
+        }
+        if (installCheck.isEmpty()) {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.daum.android.map")))
+        } else {
+            startActivity(intent)
+        }
+    }
+
 }
