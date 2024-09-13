@@ -182,7 +182,8 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
                         LatLng.from(
                             latitude,
                             longitude
-                        )
+                        ),
+                        9
                     )
                 )
                 for (item in result) {
@@ -273,7 +274,7 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
 
     private fun searchLoadToKakaoMap(data : RecommendItem) {
         val url =
-            "kakaomap://route?sp=${viewModel.getLocation().first},${viewModel.getLocation().second}&ep=${data.latitude},${data.longitude}&by=FOOT"
+            "kakaomap://route?sp=${viewModel.getLocation().first},${viewModel.getLocation().second}&ep=${data.latitude},${data.longitude}&by=CAR"
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.addCategory(Intent.CATEGORY_BROWSABLE)
