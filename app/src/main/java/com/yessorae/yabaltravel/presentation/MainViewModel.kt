@@ -128,7 +128,14 @@ class MainViewModel @Inject constructor(
             page = 0,
             size = 10
         )
-
+        if(response.isEmpty()){
+            _screenState.update {
+                MainScreenState.Error(
+                    message = "이런 해당 데이터는 없어요!"
+                )
+            }
+            return@launch
+        }
         val result = ArrayList<Recommendation>()
         for (item in response) {
             result.add(
@@ -165,8 +172,4 @@ class MainViewModel @Inject constructor(
 
     }
 
-
-    fun setTrowAgain(value: Boolean) {
-        throwAgain = value
-    }
 }
