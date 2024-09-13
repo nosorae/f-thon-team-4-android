@@ -216,14 +216,9 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
     private fun initSensor() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         shakeDetector = ShakerDetector {
-            if(!viewModel.throwAgain){
-                Log.d(this.javaClass.name , "Already Throw please wait")
-                return@ShakerDetector
-            }
             Log.d(this.javaClass.name, "Device Shaken!")
             viewModel.onThrowing()
-            viewModel.setTrowAgain(false)
-//            sensorManager.unregisterListener(shakeDetector)
+        //            sensorManager.unregisterListener(shakeDetector)
         }
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
@@ -257,14 +252,11 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
             Define.BOTTOM_SHEET_SELECT -> {
                 Log.d(this.javaClass.name, "User select go to Trip")
                 searchLoadToKakaoMap(resultCode.item!!)
-                viewModel.setTrowAgain(true)
             }
 
             Define.BOTTOM_SHEET_NO -> {
                 Log.e(this.javaClass.name, "User select reTry")
-                resetKakaoMap()
-                viewModel.setTrowAgain(true)
-            }
+                resetKakaoMap() }
         }
     }
 

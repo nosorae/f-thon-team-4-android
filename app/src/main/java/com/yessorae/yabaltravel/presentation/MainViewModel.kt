@@ -172,8 +172,4 @@ class MainViewModel @Inject constructor(
 
     }
 
-
-    fun setTrowAgain(value: Boolean) {
-        throwAgain = value
-    }
 }
