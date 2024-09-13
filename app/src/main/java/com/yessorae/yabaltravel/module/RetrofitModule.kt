@@ -67,6 +67,9 @@ object RetrofitModule {
             .baseUrl(FToneConstants.FTone_API_BASE_URL)
             .client(
                 OkHttpClient.Builder()
+                    .connectTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
                     .addInterceptor(
                         HttpLoggingInterceptor().apply {
                             if (BuildConfig.DEBUG) {
