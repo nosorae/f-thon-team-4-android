@@ -39,6 +39,9 @@ class MainViewModel @Inject constructor(
     private lateinit var recommendation: Recommendation
     private var latitude = 0.0
     private var longitude = 0.0
+    var throwAgain = true
+    private set
+
     /**
      * [BeforeThrowingState] 상태에서 추가하는 함수는 여기에 추가해주세요
      */
@@ -167,4 +170,9 @@ class MainViewModel @Inject constructor(
      * [RecommendationFailureState] 상태에서 추가하는 함수는 여기에 추가해주세요
      */
 
+
+
+    fun setTrowAgain(value : Boolean){
+        throwAgain = value
+    }
 }
