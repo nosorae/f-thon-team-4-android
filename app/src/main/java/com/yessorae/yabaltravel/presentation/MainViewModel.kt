@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.yessorae.yabaltravel.common.MapConstants
 import com.yessorae.yabaltravel.data.repository.RecommendationRepository
 import com.yessorae.yabaltravel.data.repository.RegionRepository
+import com.yessorae.yabaltravel.data.source.remote.kakao.model.Document
+import com.yessorae.yabaltravel.presentation.model.MainScreenEvent
 import com.yessorae.yabaltravel.presentation.model.MainScreenState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.AfterThrowingState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.BeforeThrowingState
@@ -15,9 +17,10 @@ import com.yessorae.yabaltravel.presentation.model.MainScreenState.Recommendatio
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.RecommendationSuccessState
 import com.yessorae.yabaltravel.presentation.model.RecommendItem
 import com.yessorae.yabaltravel.presentation.model.Recommendation
-import com.yessorae.yabaltravel.presentation.model.TestCode
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,6 +42,8 @@ class MainViewModel @Inject constructor(
     private lateinit var recommendation: Recommendation
     private var latitude = 0.0
     private var longitude = 0.0
+    private var currentRandomLocation: Document? = null
+
     /**
      * [BeforeThrowingState] 상태에서 추가하는 함수는 여기에 추가해주세요
      */
@@ -75,19 +80,6 @@ class MainViewModel @Inject constructor(
         _screenState.update { BeforeThrowingState }
     }
 
-    fun testCode() {
-        testCode.add(Recommendation("F-Lab Cafe", "카페", 127.111182,37.394660, ))
-        testCode.add(Recommendation("F-Lab 모각코", "음식점", 127.111182,37.395660 ))
-        testCode.add(Recommendation("F-Lab FTone", "관광지", 127.111182,37.393660))
-        testCode.add(Recommendation("집", "숙박", 127.111182,37.396660))
-        _screenState.update {
-            recommendation = testCode[testCode.lastIndex]
-            RecommendationSuccessState(
-                recommendation = testCode
-            )
-        }
-    }
-
     fun makeRecommendData(
         data: List<Recommendation>,
         context: Context
@@ -95,7 +87,7 @@ class MainViewModel @Inject constructor(
         geocoder = Geocoder(context)
         var result = ArrayList<RecommendItem>()
         for (item in data) {
-            val address = geocoder.getFromLocation( item.latitude , item.longitude, 1)
+            val address = geocoder.getFromLocation(item.latitude, item.longitude, 1)
             if (address == null) {
                 result.add(
                     RecommendItem(
@@ -117,27 +109,30 @@ class MainViewModel @Inject constructor(
         return result
     }
 
-    fun onClickGetRecommendation(
-        ctPrvnName: String,
-        siGunGuNam: String,
-        page: Int,
-        size: Int
-    ) = viewModelScope.launch {
-        _screenState.update {
-            val response =
-                recommendationRepository.getRecommendation(ctPrvnName, siGunGuNam, page, size)
-            val result = ArrayList<Recommendation>()
-            for (item in response) {
-                result.add(
-                    Recommendation(
-                        item.name,
-                        item.description,
-                        item.longitude,
-                        item.latitude
-                    )
+    fun onClickGetRecommendation() = viewModelScope.launch {
+        val current = currentRandomLocation ?: return@launch
+
+        val response = recommendationRepository.getRecommendation(
+            ctPrvnName = current.region1DepthName,
+            siGunGuNam = current.region2DepthName,
+            page = 0,
+            size = 10
+        )
+
+        val result = ArrayList<Recommendation>()
+        for (item in response) {
+            result.add(
+                Recommendation(
+                    item.name,
+                    item.description,
+                    item.longitude,
+                    item.latitude
                 )
-            }
-            recommendation = result[result.lastIndex]
+            )
+        }
+        recommendation = result[result.lastIndex]
+
+        _screenState.update {
             RecommendationSuccessState(
                 recommendation = result
             )
@@ -146,11 +141,13 @@ class MainViewModel @Inject constructor(
 
     fun getRecommend() = recommendation
 
-    fun setLocation(latitude : Double , longitude : Double){
+    fun setLocation(latitude: Double, longitude: Double) {
         this.latitude = latitude
         this.longitude = longitude
     }
-    fun getLocation() : Pair<Double , Double> = Pair(latitude , longitude)
+
+    fun getLocation(): Pair<Double, Double> = Pair(latitude, longitude)
+
     /**
      * [RecommendationSuccessState] 상태에서 추가하는 함수는 여기에 추가해주세요
      */
