@@ -37,6 +37,8 @@ import com.yessorae.yabaltravel.common.BottomSheetListener
 import com.yessorae.yabaltravel.common.Define
 import com.yessorae.yabaltravel.databinding.ActivityMainBinding
 import com.yessorae.yabaltravel.presentation.model.MainScreenState
+import com.yessorae.yabaltravel.presentation.model.RecommendBottomData
+import com.yessorae.yabaltravel.presentation.model.RecommendItem
 import com.yessorae.yabaltravel.presentation.model.ShakerDetector
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -238,11 +240,11 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
         sensorManager.unregisterListener(shakeDetector)
     }
 
-    override fun onBottomSheetDismissed(resultCode: Int) {
-        when (resultCode) {
+    override fun onBottomSheetDismissed(resultCode: RecommendBottomData) {
+        when (resultCode.resultCode) {
             Define.BOTTOM_SHEET_SELECT -> {
                 Log.d(this.javaClass.name, "User select go to Trip")
-                searchLoadToKakaoMap()
+                searchLoadToKakaoMap(resultCode.item!!)
                 viewModel.setTrowAgain(true)
             }
 
@@ -268,9 +270,9 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
             }
     }
 
-    private fun searchLoadToKakaoMap() {
+    private fun searchLoadToKakaoMap(data : RecommendItem) {
         val url =
-            "kakaomap://route?sp=${viewModel.getLocation().first},${viewModel.getLocation().second}&ep=${viewModel.getRecommend().latitude},${viewModel.getRecommend().longitude}&by=FOOT"
+            "kakaomap://route?sp=${viewModel.getLocation().first},${viewModel.getLocation().second}&ep=${data.latitude},${data.longitude}&by=FOOT"
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.addCategory(Intent.CATEGORY_BROWSABLE)

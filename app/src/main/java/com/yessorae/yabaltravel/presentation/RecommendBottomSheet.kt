@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.yessorae.yabaltravel.common.AdapterRecommend
 import com.yessorae.yabaltravel.common.BottomSheetListener
 import com.yessorae.yabaltravel.common.Define
 import com.yessorae.yabaltravel.databinding.BottomRecommendBinding
+import com.yessorae.yabaltravel.presentation.model.RecommendBottomData
 import com.yessorae.yabaltravel.presentation.model.RecommendItem
 import com.yessorae.yabaltravel.presentation.model.Recommendation
 
@@ -47,15 +50,22 @@ class RecommendBottomSheet(private val recommendList: ArrayList<RecommendItem> ,
     }
 
     private fun addListener() {
-        binding.btnLetGo.setOnClickListener {
-            listener?.onBottomSheetDismissed(Define.BOTTOM_SHEET_SELECT)
-            dismiss()
-        }
+//        binding.btnLetGo.setOnClickListener {
+//            listener?.onBottomSheetDismissed(Define.BOTTOM_SHEET_SELECT)
+//            dismiss()
+//        }
+        adapter.setOnClickListener(object : AdapterRecommend{
+            override fun setOnClickListener(data: RecommendItem) {
+                Log.d(this.javaClass.name , "User Select Data")
+                listener?.onBottomSheetDismissed(RecommendBottomData(Define.BOTTOM_SHEET_SELECT , data))
+                dismiss()
+            }
+        })
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        listener?.onBottomSheetDismissed(Define.BOTTOM_SHEET_NO)
+        listener?.onBottomSheetDismissed(RecommendBottomData(Define.BOTTOM_SHEET_NO, null))
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

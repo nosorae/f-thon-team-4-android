@@ -9,7 +9,6 @@ import com.yessorae.yabaltravel.common.MapConstants
 import com.yessorae.yabaltravel.data.repository.RecommendationRepository
 import com.yessorae.yabaltravel.data.repository.RegionRepository
 import com.yessorae.yabaltravel.data.source.remote.kakao.model.Document
-import com.yessorae.yabaltravel.presentation.model.MainScreenEvent
 import com.yessorae.yabaltravel.presentation.model.MainScreenState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.AfterThrowingState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.BeforeThrowingState
@@ -96,7 +95,9 @@ class MainViewModel @Inject constructor(
                     RecommendItem(
                         item.name,
                         item.description,
-                        "NULL"
+                        "NULL",
+                        item.longitude,
+                        item.latitude
                     )
                 )
                 continue
@@ -105,7 +106,9 @@ class MainViewModel @Inject constructor(
                 RecommendItem(
                     item.name,
                     item.description,
-                    address[0].getAddressLine(0)
+                    address[0].getAddressLine(0),
+                    item.longitude,
+                    item.latitude
                 )
             )
         }

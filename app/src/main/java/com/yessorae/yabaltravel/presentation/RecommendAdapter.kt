@@ -4,22 +4,29 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Adapter
 import androidx.recyclerview.widget.RecyclerView
+import com.yessorae.yabaltravel.common.AdapterRecommend
 import com.yessorae.yabaltravel.databinding.AdapterRecommendBinding
 import com.yessorae.yabaltravel.presentation.model.RecommendItem
 
 class RecommendAdapter() :
     RecyclerView.Adapter<RecommendAdapter.ViewHolder>() {
-    var recommendList =  ArrayList<RecommendItem>()
-        set(value){
+    var recommendList = ArrayList<RecommendItem>()
+        set(value) {
             field = value
             notifyDataSetChanged()
         }
+    private lateinit var setOnClickListener: AdapterRecommend
+
     inner class ViewHolder(private val binding: AdapterRecommendBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: RecommendItem) {
             binding.txtName.text = item.name
             binding.txtDescription.text = item.description
             binding.txtAddress.text = item.address
+            binding.layoutItem.setOnClickListener {
+                setOnClickListener.setOnClickListener(item)
+
+            }
         }
     }
 
@@ -35,4 +42,7 @@ class RecommendAdapter() :
         holder.bind(recommendList[position])
     }
 
+    fun setOnClickListener(listener: AdapterRecommend) {
+        setOnClickListener = listener
+    }
 }
