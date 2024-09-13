@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/black"
-    android:padding="20dp">
+    android:padding="10dp">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/txt_name"
@@ -14,6 +14,7 @@
         android:autoSizeMaxTextSize="17sp"
         android:textColor="@color/white"
         android:textSize="16sp"
+        android:layout_marginStart="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintBottom_toTopOf="@id/txt_address"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,13 +27,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:autoSizeMaxTextSize="17sp"
-        android:gravity="center"
+        android:gravity="start"
         android:textColor="@color/white"
         android:textSize="16sp"
+        android:ems="18"
+        android:maxLines="1"
+        app:layout_constraintTop_toBottomOf="@id/txt_name"
         app:layout_constraintBottom_toTopOf="@id/txt_address"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/txt_name"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:text="F Lab 최초로 열린 해커톤! " />
 
 
