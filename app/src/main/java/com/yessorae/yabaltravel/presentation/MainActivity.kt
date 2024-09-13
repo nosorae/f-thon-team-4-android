@@ -198,13 +198,14 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
                 bottomSheet.show(supportFragmentManager, bottomSheet.tag)
             }
 
-            is MainScreenState.RecommendationFailureState -> {
-                Log.d("test", "Na")
+            else -> {
+                // do nothing
             }
         }
 
         binding.btnRetry.isVisible = screenState is MainScreenState.AfterThrowingState
         binding.btnRecommendation.isVisible = screenState is MainScreenState.AfterThrowingState
+        binding.progressBar.isVisible = screenState is MainScreenState.LoadingState
     }
 
     private fun initSensor() {

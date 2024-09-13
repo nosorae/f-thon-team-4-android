@@ -68,18 +68,6 @@ object RetrofitModule {
             .client(
                 OkHttpClient.Builder()
                     .addInterceptor(
-                        Interceptor { chain ->
-                            val originalRequest = chain.request()
-                            val newRequest = originalRequest.newBuilder()
-                                .header(
-                                    name = "Authorization",
-                                    value = "${FToneConstants.HEADER_KEY} ${BuildConfig.KAKAO_API_KEY}"
-                                )
-                                .build()
-                            chain.proceed(newRequest)
-                        }
-                    )
-                    .addInterceptor(
                         HttpLoggingInterceptor().apply {
                             if (BuildConfig.DEBUG) {
                                 setLevel(HttpLoggingInterceptor.Level.BODY)
