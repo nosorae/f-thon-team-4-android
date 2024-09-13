@@ -19,4 +19,9 @@ sealed class MainScreenState {
     data class RecommendationSuccessState(
         val recommendation: List<Recommendation>
     ) : MainScreenState()
+
+
+    data class Error(
+        val message : String
+    ) : MainScreenState()
 }

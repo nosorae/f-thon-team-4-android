@@ -182,26 +182,29 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
                         LatLng.from(
                             latitude,
                             longitude
-                        )
+                        ), 11
                     )
                 )
                 for (item in result) {
                     val styles = kakaoMap!!.labelManager
                         ?.addLabelStyles(
-                            LabelStyles.from(LabelStyle.from(R.drawable.pink_marker))
+                            LabelStyles.from(LabelStyle.from(R.drawable.pink_marker).setZoomLevel(5))
                         )
                     val options = LabelOptions.from(LatLng.from(item.latitude, item.longitude))
                         .setStyles(styles)
                     val layer = kakaoMap!!.labelManager!!.layer
                     val label = layer!!.addLabel(options)
                 }
+
                 val recommendData = viewModel.makeRecommendData(result, this)
                 val bottomSheet = RecommendBottomSheet(recommendData, this)
                 bottomSheet.show(supportFragmentManager, bottomSheet.tag)
             }
-
-            else -> {
-                // do nothing
+            is MainScreenState.Error ->{
+                Toast.makeText(this , screenState.message , Toast.LENGTH_SHORT).show()
+            }
+            else ->{
+                //do noting
             }
         }
 
@@ -273,7 +276,7 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
 
     private fun searchLoadToKakaoMap(data : RecommendItem) {
         val url =
-            "kakaomap://route?sp=${viewModel.getLocation().first},${viewModel.getLocation().second}&ep=${data.latitude},${data.longitude}&by=FOOT"
+            "kakaomap://route?sp=${viewModel.getLocation().first},${viewModel.getLocation().second}&ep=${data.latitude},${data.longitude}&by=CAR"
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.addCategory(Intent.CATEGORY_BROWSABLE)
