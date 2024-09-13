@@ -237,6 +237,14 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
     private fun resetKakaoMap() {
         val labelManager = kakaoMap?.labelManager ?: return
         labelManager.clearAll()
+        kakaoMap?.moveCamera(
+            CameraUpdateFactory.newCenterPosition(
+                LatLng.from(
+                    startPosition.latitude,
+                    startPosition.longitude
+                ), 6
+            )
+        )
     }
 
     override fun onDestroy() {
