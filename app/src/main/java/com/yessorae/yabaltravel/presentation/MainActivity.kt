@@ -70,7 +70,6 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
         }
     private val readyCallback: KakaoMapReadyCallback = object : KakaoMapReadyCallback() {
         override fun onMapReady(kakaoMap: KakaoMap) {
-            Toast.makeText(applicationContext, "Map Start!", Toast.LENGTH_SHORT).show()
             this@MainActivity.kakaoMap = kakaoMap
         }
 
@@ -92,17 +91,11 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
         }
 
         override fun onMapDestroy() {
-            Toast.makeText(
-                applicationContext, "onMapDestroy",
-                Toast.LENGTH_SHORT
-            ).show()
+            // do nothing
         }
 
         override fun onMapError(error: java.lang.Exception) {
-            Toast.makeText(
-                applicationContext, error.message,
-                Toast.LENGTH_SHORT
-            ).show()
+            // do nothing
         }
     }
 
