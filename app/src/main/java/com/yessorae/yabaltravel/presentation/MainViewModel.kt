@@ -12,14 +12,11 @@ import com.yessorae.yabaltravel.data.source.remote.kakao.model.Document
 import com.yessorae.yabaltravel.presentation.model.MainScreenState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.AfterThrowingState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.BeforeThrowingState
-import com.yessorae.yabaltravel.presentation.model.MainScreenState.RecommendationFailureState
 import com.yessorae.yabaltravel.presentation.model.MainScreenState.RecommendationSuccessState
 import com.yessorae.yabaltravel.presentation.model.RecommendItem
 import com.yessorae.yabaltravel.presentation.model.Recommendation
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,13 +33,12 @@ class MainViewModel @Inject constructor(
         MutableStateFlow<MainScreenState>(BeforeThrowingState)
     val screenState = _screenState.asStateFlow()
 
-    private val testCode = ArrayList<Recommendation>()
     private lateinit var geocoder: Geocoder
     private lateinit var recommendation: Recommendation
     private var latitude = 0.0
     private var longitude = 0.0
     var throwAgain = true
-    private set
+        private set
 
     private var currentRandomLocation: Document? = null
 
@@ -65,6 +61,8 @@ class MainViewModel @Inject constructor(
         ).firstOrNull()
 
         response ?: return@launch
+
+        currentRandomLocation = response
 
         _screenState.update {
             AfterThrowingState(
@@ -118,6 +116,12 @@ class MainViewModel @Inject constructor(
     fun onClickGetRecommendation() = viewModelScope.launch {
         val current = currentRandomLocation ?: return@launch
 
+        _screenState.update {
+            MainScreenState.LoadingState(
+                prevState = screenState.value
+            )
+        }
+
         val response = recommendationRepository.getRecommendation(
             ctPrvnName = current.region1DepthName,
             siGunGuNam = current.region2DepthName,
@@ -162,13 +166,7 @@ class MainViewModel @Inject constructor(
     }
 
 
-    /**
-     * [RecommendationFailureState] 상태에서 추가하는 함수는 여기에 추가해주세요
-     */
-
-
-
-    fun setTrowAgain(value : Boolean){
+    fun setTrowAgain(value: Boolean) {
         throwAgain = value
     }
 }

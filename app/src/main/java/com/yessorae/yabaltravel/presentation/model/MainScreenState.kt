@@ -1,6 +1,11 @@
 package com.yessorae.yabaltravel.presentation.model
 
 sealed class MainScreenState {
+    // 로딩
+    data class LoadingState(
+        val prevState: MainScreenState
+    ) : MainScreenState()
+
     // 초기화 작업
     data object BeforeThrowingState : MainScreenState()
 
@@ -13,10 +18,5 @@ sealed class MainScreenState {
     // 추천 목록을 가져오는데 성공하면 이 상태로 전환
     data class RecommendationSuccessState(
         val recommendation: List<Recommendation>
-    ) : MainScreenState()
-
-    // 추천 목록을 가져오는데 실패하면 이 상태로 전환
-    data class RecommendationFailureState(
-        val errorMessage: String
     ) : MainScreenState()
 }
