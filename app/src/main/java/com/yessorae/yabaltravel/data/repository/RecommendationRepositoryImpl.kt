@@ -16,7 +16,10 @@ class RecommendationRepositoryImpl @Inject constructor(private val fTonApi: FTon
         size: Int
     ): List<RegionInfo> {
         return fTonApi.getRegionInfo(
-            ctPrvnName, siGunGuNam, page, size
+            ctPrvnName,
+            siGunGuNam,
+            page,
+            size
         ).data
     }
 }

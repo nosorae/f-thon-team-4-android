@@ -1,23 +1,28 @@
 package com.yessorae.yabaltravel.presentation
 
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.kakao.vectormap.KakaoMap
 import com.kakao.vectormap.KakaoMapReadyCallback
 import com.kakao.vectormap.KakaoMapSdk
@@ -27,12 +32,6 @@ import com.kakao.vectormap.camera.CameraUpdateFactory
 import com.kakao.vectormap.label.LabelOptions
 import com.kakao.vectormap.label.LabelStyle
 import com.kakao.vectormap.label.LabelStyles
-import android.Manifest
-import android.annotation.SuppressLint
-import android.location.Location
-import androidx.activity.result.contract.ActivityResultContracts
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.yessorae.yabaltravel.R
 import com.yessorae.yabaltravel.common.BottomSheetListener
 import com.yessorae.yabaltravel.common.Define
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
                 Log.i("Permission: ", "Granted")
                 getLastKnownLocation()
             } else {
-               finish()
+                finish()
             }
         }
     private val readyCallback: KakaoMapReadyCallback = object : KakaoMapReadyCallback() {
@@ -127,8 +126,7 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
         }
 
         binding.btnRecommendation.setOnClickListener {
-            viewModel.testCode()
-//            viewModel.onClickGetRecommendation("서울특별시","강남구" ,1 , 10)
+            viewModel.onClickGetRecommendation()
         }
     }
 
@@ -190,13 +188,13 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
                         ?.addLabelStyles(
                             LabelStyles.from(LabelStyle.from(R.drawable.pink_marker))
                         )
-                    val options = LabelOptions.from(LatLng.from(item.latitude , item.longitude))
+                    val options = LabelOptions.from(LatLng.from(item.latitude, item.longitude))
                         .setStyles(styles)
                     val layer = kakaoMap!!.labelManager!!.layer
                     val label = layer!!.addLabel(options)
                 }
                 val recommendData = viewModel.makeRecommendData(result, this)
-                val bottomSheet = RecommendBottomSheet(recommendData ,this)
+                val bottomSheet = RecommendBottomSheet(recommendData, this)
                 bottomSheet.show(supportFragmentManager, bottomSheet.tag)
             }
 
@@ -255,6 +253,7 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
             }
         }
     }
+
     @SuppressLint("MissingPermission")
     private fun getLastKnownLocation() {
         fusedLocationClient.lastLocation
@@ -263,16 +262,17 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
                     val latitude = it.latitude
                     val longitude = it.longitude
                     // 여기서 좌표를 사용
-                    viewModel.setLocation(latitude , longitude)
+                    viewModel.setLocation(latitude, longitude)
                     Log.d("MainActivity", "Latitude: $latitude, Longitude: $longitude")
                 }
             }
     }
 
     private fun searchLoadToKakaoMap() {
-        val url ="kakaomap://route?sp=${viewModel.getLocation().first},${viewModel.getLocation().second}&ep=${viewModel.getRecommend().latitude},${viewModel.getRecommend().longitude}&by=FOOT"
+        val url =
+            "kakaomap://route?sp=${viewModel.getLocation().first},${viewModel.getLocation().second}&ep=${viewModel.getRecommend().latitude},${viewModel.getRecommend().longitude}&by=FOOT"
 
-        val intent =  Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.addCategory(Intent.CATEGORY_BROWSABLE)
 
         val installCheck = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -287,7 +287,12 @@ class MainActivity : AppCompatActivity(), BottomSheetListener {
             )
         }
         if (installCheck.isEmpty()) {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.daum.android.map")))
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("market://details?id=net.daum.android.map")
+                )
+            )
         } else {
             startActivity(intent)
         }
